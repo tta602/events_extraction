@@ -20,6 +20,8 @@ class EventTypeClassifier:
         os.makedirs(checkpoint_dir, exist_ok=True)
 
     def train(self, train_loader, val_loader, epochs=3):
+        best_val_loss = float('inf')  # Khởi tạo với giá trị rất lớn
+
         for epoch in range(epochs):
             self.model.train()
             total_loss = 0
@@ -37,12 +39,16 @@ class EventTypeClassifier:
             avg_loss = total_loss / len(train_loader)
             print(f"Epoch {epoch+1} Train Loss: {avg_loss:.4f}")
 
-            self.evaluate(val_loader)
+            # Evaluate và lấy val_loss
+            val_loss = self.evaluate(val_loader)  # Giả sử hàm evaluate trả về loss
 
-            # Save checkpoint
-            checkpoint_path = os.path.join(self.checkpoint_dir, f"model_epoch_{epoch+1}.pt")
-            torch.save(self.model.state_dict(), checkpoint_path)
-            print(f"Checkpoint saved at {checkpoint_path}")
+            # Nếu val_loss tốt hơn best_val_loss → lưu checkpoint
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                checkpoint_path = os.path.join(self.checkpoint_dir, "best_model.pt")
+                torch.save(self.model.state_dict(), checkpoint_path)
+                print(f"New best model saved at {checkpoint_path} with val_loss = {val_loss:.4f}")
+
 
     def evaluate(self, data_loader):
         self.model.eval()
