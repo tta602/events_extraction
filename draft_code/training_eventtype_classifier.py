@@ -6,7 +6,7 @@ from tqdm import tqdm
 import os
 from src.utils.device_util import getDeviceInfo
 from src.utils.data_utils import build_label_maps
-from src.eventtype_classifier import EventTypeClassifier
+from draft_code.eventtype_classifier import EventTypeClassifier
 from src.wikievents_dataset import WikiEventsSentenceDataset
 
 device = getDeviceInfo()

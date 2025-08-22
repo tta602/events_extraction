@@ -27,3 +27,22 @@ def build_label_maps(json_path, cache_path="label_maps.json"):
         json.dump({"label2id": label2id, "id2label": id2label}, f, ensure_ascii=False, indent=2)
     print(f"Saved label maps to {cache_path}")
     return label2id, id2label
+
+def build_labels(json_path, cache_path="labels.json"):
+    # Nếu có cache thì load
+    if os.path.exists(cache_path):
+        with open(cache_path, "r", encoding="utf-8") as f:
+            labels = json.load(f)
+        print(f"Loaded labels from {cache_path}")
+        return labels
+
+    # Nếu chưa có cache thì build từ file gốc
+    raw_data = load_json_or_jsonl(json_path)
+    labels = sorted({ev["event_type"] for doc in raw_data for ev in doc.get("event_mentions", [])})
+
+    # Save lại cache
+    with open(cache_path, "w", encoding="utf-8") as f:
+        json.dump(labels, f, ensure_ascii=False, indent=2)
+    print(f"Saved labels to {cache_path}")
+
+    return labels
