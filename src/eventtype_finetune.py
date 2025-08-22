@@ -21,7 +21,7 @@ class EventRetrieverFineTune(nn.Module):
     
 
 class EventRetrieverTrainer:
-    def __init__(self, model, tokenizer, train_dataset, event_types, device,
+    def __init__(self, model, tokenizer, train_dataset, val_dataset, event_types, device,
                  batch_size=16, lr=2e-5, epochs=3, max_length=128, checkpoint_dir="./checkpoints"):
         self.model = model.to(device)
         self.tokenizer = tokenizer
@@ -34,48 +34,62 @@ class EventRetrieverTrainer:
 
         # build DataLoader
         train_triplet = EventTripletDataset(train_dataset, event_types, tokenizer, max_length)
+        val_triplet   = EventTripletDataset(val_dataset, event_types, tokenizer, max_length)
+
         self.train_loader = DataLoader(train_triplet, batch_size=batch_size, shuffle=True)
+        self.val_loader   = DataLoader(val_triplet, batch_size=batch_size, shuffle=False)
 
         os.makedirs(checkpoint_dir, exist_ok=True)
 
+    def compute_loss(self, batch):
+        sent_emb = self.model(batch["sent_input_ids"].to(self.device),
+                              batch["sent_attention_mask"].to(self.device))
+        pos_emb = self.model(batch["pos_input_ids"].to(self.device),
+                             batch["pos_attention_mask"].to(self.device))
+        neg_emb = self.model(batch["neg_input_ids"].to(self.device),
+                             batch["neg_attention_mask"].to(self.device))
+
+        pos_score = (sent_emb * pos_emb).sum(dim=1)
+        neg_score = (sent_emb * neg_emb).sum(dim=1)
+
+        loss = torch.clamp(1.0 - pos_score + neg_score, min=0).mean()
+        return loss
+
+    def evaluate(self, loader):
+        self.model.eval()
+        total_loss = 0
+        with torch.no_grad():
+            for batch in loader:
+                loss = self.compute_loss(batch)
+                total_loss += loss.item()
+        return total_loss / len(loader)
+
     def train(self):
-        best_loss = 1e9
+        best_val_loss = 1e9
         for epoch in range(self.epochs):
             self.model.train()
             total_loss = 0
 
-            # dùng tqdm ở đây
             progress_bar = tqdm(self.train_loader, desc=f"Epoch {epoch+1}/{self.epochs}", leave=False)
 
             for batch in progress_bar:
                 self.optimizer.zero_grad()
-
-                sent_emb = self.model(batch["sent_input_ids"].to(self.device),
-                                    batch["sent_attention_mask"].to(self.device))
-                pos_emb = self.model(batch["pos_input_ids"].to(self.device),
-                                    batch["pos_attention_mask"].to(self.device))
-                neg_emb = self.model(batch["neg_input_ids"].to(self.device),
-                                    batch["neg_attention_mask"].to(self.device))
-
-                pos_score = (sent_emb * pos_emb).sum(dim=1)
-                neg_score = (sent_emb * neg_emb).sum(dim=1)
-
-                loss = torch.clamp(1.0 - pos_score + neg_score, min=0).mean()
+                loss = self.compute_loss(batch)
                 loss.backward()
                 self.optimizer.step()
 
                 total_loss += loss.item()
-
-                # update tqdm bar
                 progress_bar.set_postfix({"batch_loss": loss.item()})
 
-            avg_loss = total_loss / len(self.train_loader)
-            print(f"Epoch {epoch+1}, Avg Loss: {avg_loss:.4f}")
+            avg_train_loss = total_loss / len(self.train_loader)
+            avg_val_loss = self.evaluate(self.val_loader)
 
-            # save best model
-            if avg_loss < best_loss:
-                best_loss = avg_loss
+            print(f"Epoch {epoch+1}, Train Loss: {avg_train_loss:.4f}, Val Loss: {avg_val_loss:.4f}")
+
+            # save best model on val
+            if avg_val_loss < best_val_loss:
+                best_val_loss = avg_val_loss
                 save_path = os.path.join(self.checkpoint_dir, "retrieve_best_model")
                 self.model.encoder.save_pretrained(save_path)
                 self.tokenizer.save_pretrained(save_path)
-                print(f"Saved best model to {save_path}")
+                print(f"Saved best model to {save_path} (val loss {avg_val_loss:.4f})")

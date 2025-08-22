@@ -48,25 +48,27 @@ train_dataset = WikiEventsSentenceDataset(TRAIN_JSON_PATH, tokenizer, MAX_LENGTH
 val_dataset = WikiEventsSentenceDataset(VAL_JSON_PATH, tokenizer, MAX_LENGTH, VAL_CACHE_PATH)
 test_dataset = WikiEventsSentenceDataset(TEST_JSON_PATH, tokenizer, MAX_LENGTH, TEST_CACHE_PATH)
 
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE)
-test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE)
+train_triplet_dataset = EventTripletDataset(train_dataset, event_types, tokenizer, MAX_LENGTH)
+val_triplet_dataset = EventTripletDataset(val_dataset, event_types, tokenizer, MAX_LENGTH)
+test_triplet_dataset = EventTripletDataset(test_dataset, event_types, tokenizer, MAX_LENGTH)
+
+train_loader = DataLoader(train_triplet_dataset, batch_size=BATCH_SIZE, shuffle=True)
+val_loader = DataLoader(train_triplet_dataset, batch_size=BATCH_SIZE, shuffle=True)
+test_loader = DataLoader(train_triplet_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 # model_name, device, event_types
-retriever = EventTypeRetriever(model_name=MODEL_NAME, device=device, event_types=event_types)
-
 sentence = "Roadside IED <tgr> kills </tgr> Russian major general in Syria"
 top_k = 3
-print(retriever.retrieve(sentence, topk=top_k))
 
-triplet_dataset = EventTripletDataset(train_dataset, event_types, tokenizer, MAX_LENGTH)
-train_loader = DataLoader(triplet_dataset, batch_size=BATCH_SIZE, shuffle=True)
+retriever = EventTypeRetriever(model_name=MODEL_NAME, device=device, event_types=event_types)
+print(retriever.retrieve(sentence, topk=top_k))
 
 model = EventRetrieverFineTune(MODEL_NAME)
 trainer = EventRetrieverTrainer(
     model=model,
     tokenizer=tokenizer,
     train_dataset=train_dataset,  
+    val_dataset=val_dataset,
     event_types=event_types,
     device=device,
     batch_size=BATCH_SIZE,
@@ -76,6 +78,10 @@ trainer = EventRetrieverTrainer(
 )
 
 trainer.train()
+
+avg_test_loss = trainer.evaluate(test_loader)
+print(f"Test Loss: {avg_test_loss:.4f}")
+
 
 retriever = EventTypeRetriever(
     model_name=f"{CHECKPOINT_DIR}/retrieve_best_model",
