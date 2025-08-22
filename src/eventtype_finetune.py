@@ -6,7 +6,6 @@ from torch.optim import AdamW
 import torch.nn.functional as F
 import torch.nn as nn
 from tqdm import tqdm
-from src.eventtriplet_dataset import EventTripletDataset
 
 class EventRetrieverFineTune(nn.Module):
     def __init__(self, model_name):
@@ -21,7 +20,7 @@ class EventRetrieverFineTune(nn.Module):
     
 
 class EventRetrieverTrainer:
-    def __init__(self, model, tokenizer, train_dataset, val_dataset, event_types, device,
+    def __init__(self, model, tokenizer, train_loader, val_loader, event_types, device,
                  batch_size=16, lr=2e-5, epochs=3, max_length=128, checkpoint_dir="./checkpoints"):
         self.model = model.to(device)
         self.tokenizer = tokenizer
@@ -32,12 +31,8 @@ class EventRetrieverTrainer:
 
         self.optimizer = AdamW(self.model.parameters(), lr=lr)
 
-        # build DataLoader
-        train_triplet = EventTripletDataset(train_dataset, event_types, tokenizer, max_length)
-        val_triplet   = EventTripletDataset(val_dataset, event_types, tokenizer, max_length)
-
-        self.train_loader = DataLoader(train_triplet, batch_size=batch_size, shuffle=True)
-        self.val_loader   = DataLoader(val_triplet, batch_size=batch_size, shuffle=False)
+        self.train_loader = train_loader
+        self.val_loader   = val_loader
 
         os.makedirs(checkpoint_dir, exist_ok=True)
 

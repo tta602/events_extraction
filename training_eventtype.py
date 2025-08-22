@@ -65,16 +65,16 @@ print(retriever.retrieve(sentence, topk=top_k))
 
 model = EventRetrieverFineTune(MODEL_NAME)
 trainer = EventRetrieverTrainer(
-    model=model,
-    tokenizer=tokenizer,
-    train_dataset=train_dataset,  
-    val_dataset=val_dataset,
-    event_types=event_types,
-    device=device,
-    batch_size=BATCH_SIZE,
-    lr=LEARNING_RATE,
-    epochs=EPOCHS,
-    checkpoint_dir=CHECKPOINT_DIR
+    model = model,
+    tokenizer = tokenizer,
+    train_loader=train_loader,  
+    val_loader = val_dataset,
+    event_types = event_types,
+    device = device,
+    batch_size = BATCH_SIZE,
+    lr = LEARNING_RATE,
+    epochs = EPOCHS,
+    checkpoint_dir = CHECKPOINT_DIR
 )
 
 trainer.train()
