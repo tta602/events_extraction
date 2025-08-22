@@ -49,15 +49,22 @@ class EventRetrieverTrainer:
 
         loss = torch.clamp(1.0 - pos_score + neg_score, min=0).mean()
         return loss
-
-    def evaluate(self, loader):
+    
+    def evaluate(self, loader, split="Val"):
         self.model.eval()
         total_loss = 0
+        progress_bar = tqdm(loader, desc=f"Evaluating {split}", leave=False)
         with torch.no_grad():
-            for batch in loader:
+            for batch in progress_bar:
                 loss = self.compute_loss(batch)
                 total_loss += loss.item()
+                progress_bar.set_postfix({"batch_loss": loss.item()})
         return total_loss / len(loader)
+    
+    def test(self, test_loader):
+        avg_test_loss = self.evaluate(test_loader, split="Test")
+        print(f"Test Loss: {avg_test_loss:.4f}")
+        return avg_test_loss
 
     def train(self):
         best_val_loss = 1e9

@@ -68,7 +68,7 @@ trainer = EventRetrieverTrainer(
     model = model,
     tokenizer = tokenizer,
     train_loader=train_loader,  
-    val_loader = val_dataset,
+    val_loader = val_loader,
     event_types = event_types,
     device = device,
     batch_size = BATCH_SIZE,
@@ -79,9 +79,7 @@ trainer = EventRetrieverTrainer(
 
 trainer.train()
 
-avg_test_loss = trainer.evaluate(test_loader)
-print(f"Test Loss: {avg_test_loss:.4f}")
-
+avg_test_loss = trainer.test(test_loader)
 
 retriever = EventTypeRetriever(
     model_name=f"{CHECKPOINT_DIR}/retrieve_best_model",
