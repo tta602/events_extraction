@@ -21,7 +21,7 @@ MODEL_NAME = "roberta-base"
 MAX_LENGTH = 128
 BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
-EPOCHS = 1
+EPOCHS = 5
 
 CONTEXT_PATH = ""
 CHECKPOINT_DIR = f"{CONTEXT_PATH}checkpoints"
@@ -56,7 +56,8 @@ test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE)
 retriever = EventTypeRetriever(model_name=MODEL_NAME, device=device, event_types=event_types)
 
 sentence = "Roadside IED <tgr> kills </tgr> Russian major general in Syria"
-print(retriever.retrieve(sentence, topk=3))
+top_k = 3
+print(retriever.retrieve(sentence, topk=top_k))
 
 triplet_dataset = EventTripletDataset(train_dataset, event_types, tokenizer, MAX_LENGTH)
 train_loader = DataLoader(triplet_dataset, batch_size=BATCH_SIZE, shuffle=True)
@@ -65,7 +66,7 @@ model = EventRetrieverFineTune(MODEL_NAME)
 trainer = EventRetrieverTrainer(
     model=model,
     tokenizer=tokenizer,
-    train_dataset=train_dataset,   # chính là WikiEventsSentenceDataset bạn đã load
+    train_dataset=train_dataset,  
     event_types=event_types,
     device=device,
     batch_size=BATCH_SIZE,
@@ -82,4 +83,4 @@ retriever = EventTypeRetriever(
     event_types=event_types
 )
 
-print(retriever.retrieve("Roadside IED <tgr> kills </tgr> Russian major general in Syria", topk=3))
+print(retriever.retrieve(sentence, topk=top_k))
