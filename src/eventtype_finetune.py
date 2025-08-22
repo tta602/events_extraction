@@ -17,12 +17,12 @@ class EventRetrieverFineTune(nn.Module):
         embeddings = outputs.last_hidden_state.mean(dim=1)   # mean pooling
         embeddings = F.normalize(embeddings, p=2, dim=1)     # normalize để cosine
         return embeddings
-    
 
 class EventRetrieverTrainer:
     def __init__(self, model, tokenizer, train_loader, val_loader, event_types, device,
                  batch_size=16, lr=2e-5, epochs=3, max_length=128, checkpoint_dir="./checkpoints"):
         self.model = model.to(device)
+        self.model.encoder.resize_token_embeddings(len(tokenizer))  
         self.tokenizer = tokenizer
         self.device = device
         self.event_types = event_types

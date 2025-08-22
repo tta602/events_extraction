@@ -4,10 +4,11 @@ import torch
 import torch.nn.functional as F
 
 class EventTypeRetriever:
-    def __init__(self, model_name, device, event_types):
+    def __init__(self, model_name, tokenizer, device, event_types):
         self.device = device
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.tokenizer = tokenizer
         self.model = AutoModel.from_pretrained(model_name).to(device)
+        self.model.resize_token_embeddings(len(tokenizer))
         self.model.eval()
 
         # Encode tất cả event types (ontology)
