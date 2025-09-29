@@ -18,7 +18,7 @@ print(f"Device info::: {device}")
 
 MODEL_NAME = "roberta-base"
 
-MAX_LENGTH = 128
+MAX_LENGTH = 256
 BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
 EPOCHS = 1
