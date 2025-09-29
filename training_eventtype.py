@@ -21,7 +21,7 @@ MODEL_NAME = "roberta-base"
 MAX_LENGTH = 128
 BATCH_SIZE = 16
 LEARNING_RATE = 2e-5
-EPOCHS = 5
+EPOCHS = 1
 
 CONTEXT_PATH = ""
 CHECKPOINT_DIR = f"{CONTEXT_PATH}checkpoints"
@@ -53,8 +53,8 @@ val_triplet_dataset = EventTripletDataset(val_dataset, event_types, tokenizer, M
 test_triplet_dataset = EventTripletDataset(test_dataset, event_types, tokenizer, MAX_LENGTH)
 
 train_loader = DataLoader(train_triplet_dataset, batch_size=BATCH_SIZE, shuffle=True)
-val_loader = DataLoader(train_triplet_dataset, batch_size=BATCH_SIZE, shuffle=True)
-test_loader = DataLoader(train_triplet_dataset, batch_size=BATCH_SIZE, shuffle=True)
+val_loader = DataLoader(val_triplet_dataset, batch_size=BATCH_SIZE, shuffle=False)
+test_loader = DataLoader(test_triplet_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 # model_name, device, event_types
 sentence = "Roadside IED <tgr> kills </tgr> Russian major general in Syria"
@@ -64,6 +64,7 @@ retriever = EventTypeRetriever(model_name=MODEL_NAME, device=device, event_types
 print(retriever.retrieve(sentence, topk=top_k))
 
 model = EventRetrieverFineTune(MODEL_NAME)
+model.encoder.resize_token_embeddings(len(tokenizer)) 
 
 trainer = EventRetrieverTrainer(
     model = model,

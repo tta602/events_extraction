@@ -1,3 +1,5 @@
 checkpoints/*
 data/*
 processing_data/*
+logs/*
+RGQA/*
