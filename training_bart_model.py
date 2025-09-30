@@ -13,9 +13,9 @@ from src.utils.device_util import getDeviceInfo
 # ---------------------- Config ----------------------
 DEVICE = getDeviceInfo()
 BART_MODEL = "facebook/bart-base"
-MAX_LENGTH = 256
+MAX_LENGTH = 128
 OUTPUT_MAX_LENGTH = 64
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 EPOCHS = 1
 LR = 3e-5
 TOP_K = 3
