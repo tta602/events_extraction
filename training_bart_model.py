@@ -43,7 +43,8 @@ retriever = EventTypeRetriever(
     model_name=f"{CHECKPOINT_DIR}/retrieve_best_model",
     device=DEVICE,
     tokenizer=tokenizer,
-    event_types=event_types
+    event_types=event_types,
+    max_length=MAX_LENGTH
 )
 
 # ---------------------- Load samples ----------------------
