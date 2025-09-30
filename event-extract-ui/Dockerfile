@@ -1,10 +1,12 @@
 # frontend Dockerfile
-FROM node:18
+FROM node:22
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+
+# Xóa cache cũ để tránh lỗi optional dependencies
+RUN npm ci --legacy-peer-deps
 
 COPY . .
 
