@@ -1,0 +1,6 @@
+import nltk
+
+# tải punkt một lần
+nltk.download("punkt")
+# một số version mới cần thêm
+nltk.download("punkt_tab")
