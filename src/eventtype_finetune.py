@@ -91,7 +91,7 @@ class EventRetrieverTrainer:
             # save best model on val
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
-                save_path = os.path.join(self.checkpoint_dir, "retrieve_best_model")
+                save_path = os.path.join(self.checkpoint_dir, f"retrieve_epoch{epoch+1}")
                 self.model.encoder.save_pretrained(save_path)
                 self.tokenizer.save_pretrained(save_path)
                 print(f"Saved best model to {save_path} (val loss {avg_val_loss:.4f})")
