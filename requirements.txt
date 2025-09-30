@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+torchvision
+torch
+transformers
+tqdm
+nltk
