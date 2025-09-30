@@ -9,6 +9,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import BartForConditionalGeneration, AutoTokenizer
 import nltk
+import re
+from fastapi.middleware.cors import CORSMiddleware
 
 # ---- utils from your repo ----
 from src.eventtype_retriever import EventTypeRetriever
@@ -150,7 +152,13 @@ retriever, retr_tokenizer = load_retriever_and_tokenizer(RETRIEVER_CKPT_DIR, RET
 
 # ---------------- FastAPI ----------------
 app = FastAPI(title="Event Extraction API (2-stage R-GQA style)")
-
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=["http://localhost:5173"],  # adjust port Vite uses
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 class ExtractRequest(BaseModel):
     text: str
     top_k: int = TOP_K
@@ -167,6 +175,10 @@ class SentenceResult(BaseModel):
     index_input: int
     role_answers: List[RoleAnswer]
 
+def simple_sent_tokenize(text: str):
+    # cắt theo dấu . ! ? + xuống dòng
+    sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+    return [s for s in sentences if s]
 
 @app.post("/extract", response_model=List[SentenceResult])
 def extract(req: ExtractRequest):
@@ -174,7 +186,7 @@ def extract(req: ExtractRequest):
     top_k = req.top_k
 
     # 1) split sentences
-    sentences = sent_tokenize(text)
+    sentences = simple_sent_tokenize(text)
     results: List[Dict[str, Any]] = []
 
     for idx, sent in enumerate(sentences):
