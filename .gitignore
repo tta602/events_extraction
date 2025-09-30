@@ -1,5 +1,4 @@
 checkpoints/*
-data/*
-processing_data/*
+processing_data/*.json
 logs/*
 RGQA/*
