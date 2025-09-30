@@ -1,33 +1,23 @@
 import React from "react";
-import { Bar } from "@ant-design/plots";
 import type { SentenceResult } from "../types";
+import EventPieChart from "./chart/EventPieChart";
+import RoleBarChart from "./chart/RoleBarChart";
+import EventRoleHeatmap from "./chart/EventRoleHeatmap";
+import EventRoleGraph from "./chart/EventRoleGraph";
 
 interface Props {
   data: SentenceResult[];
 }
 
 const ChartTab: React.FC<Props> = ({ data }) => {
-  const statsData = data.flatMap((d) => d.role_answers);
-  const chartData = statsData.reduce<Record<string, number>>((acc, cur) => {
-    const key = `${cur.event_type} - ${cur.role}`;
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-
-  const plotData = Object.entries(chartData).map(([key, count]) => ({
-    role: key,
-    count,
-  }));
-
-  const config = {
-    data: plotData,
-    xField: "count",
-    yField: "role",
-    seriesField: "role",
-    legend: false,
-  };
-
-  return <Bar {...config} />;
+  return (
+    <div style={{ display: "grid", gap: 32 }}>
+      <EventPieChart data={data} />
+      {/* <RoleBarChart data={data} /> */}
+      {/* <EventRoleHeatmap data={data} /> */}
+      {/* <EventRoleGraph data={data} /> */}
+    </div>
+  );
 };
 
 export default ChartTab;

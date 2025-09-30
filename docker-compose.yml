@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: .
+    container_name: event_backend
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./event-extract-ui
+    container_name: event_frontend
+    volumes:
+      - ./event-extract-ui:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend

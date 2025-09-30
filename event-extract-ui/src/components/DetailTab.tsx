@@ -44,7 +44,6 @@ const DetailTab: React.FC<Props> = ({ data }) => {
                 {item.input}
             </div>
         }
-
           style={{ marginBottom: 24, boxShadow: "0 2px 8px #f0f1f2" }}
         >
           <Table
