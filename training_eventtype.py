@@ -60,7 +60,7 @@ test_loader = DataLoader(test_triplet_dataset, batch_size=BATCH_SIZE, shuffle=Fa
 sentence = "Roadside IED <tgr> kills </tgr> Russian major general in Syria"
 top_k = 3
 
-retriever = EventTypeRetriever(model_name=MODEL_NAME, device=device, event_types=event_types, tokenizer=tokenizer,)
+retriever = EventTypeRetriever(model_name=MODEL_NAME, device=device, event_types=event_types, tokenizer=tokenizer, max_length=MAX_LENGTH)
 print(retriever.retrieve(sentence, topk=top_k))
 
 model = EventRetrieverFineTune(MODEL_NAME)
@@ -87,7 +87,8 @@ retriever = EventTypeRetriever(
     model_name=f"{CHECKPOINT_DIR}/retrieve_best_model",
     device=device,
     tokenizer=tokenizer,
-    event_types=event_types
+    event_types=event_types,
+    max_length=MAX_LENGTH
 )
 
 print(retriever.retrieve(sentence, topk=top_k))
