@@ -10,6 +10,7 @@ services:
   frontend:
     build: ./event-extract-ui
     container_name: event_frontend
+    platform: linux/amd64
     volumes:
       - ./event-extract-ui:/app
     ports:

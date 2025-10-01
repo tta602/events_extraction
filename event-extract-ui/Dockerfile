@@ -1,12 +1,11 @@
-# frontend Dockerfile
-FROM node:22
+FROM node:22-bullseye
 
 WORKDIR /app
 
 COPY package*.json ./
 
-# Xóa cache cũ để tránh lỗi optional dependencies
-RUN npm ci --legacy-peer-deps
+# Xóa node_modules + cache trước khi install
+RUN npm ci --force --legacy-peer-deps
 
 COPY . .
 
