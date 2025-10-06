@@ -64,6 +64,13 @@ retriever = EventTypeRetriever(model_name=MODEL_NAME, device=device, event_types
 print(retriever.retrieve(sentence, topk=top_k))
 
 model = EventRetrieverFineTune(MODEL_NAME)
+model = EventTypeRetriever(
+    model_name=f"{CHECKPOINT_DIR}/retrieve_best_model",
+    device=device,
+    tokenizer=AutoTokenizer.from_pretrained(f"{CHECKPOINT_DIR}/retrieve_best_model"),
+    event_types=event_types,
+    max_length=MAX_LENGTH
+)
 model.encoder.resize_token_embeddings(len(tokenizer)) 
 
 trainer = EventRetrieverTrainer(
