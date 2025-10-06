@@ -3,6 +3,7 @@ import os
 import json
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from collections import Counter
 
 import torch
 from fastapi import FastAPI
@@ -154,7 +155,7 @@ retriever, retr_tokenizer = load_retriever_and_tokenizer(RETRIEVER_CKPT_DIR, RET
 app = FastAPI(title="Event Extraction API (2-stage R-GQA style)")
 app.add_middleware(
   CORSMiddleware,
-  allow_origins=["http://localhost:5173"],  # adjust port Vite uses
+  allow_origins=["http://localhost:5173", "http://localhost:3000"],  # adjust port Vite uses
   allow_credentials=True,
   allow_methods=["*"],
   allow_headers=["*"],
@@ -174,6 +175,17 @@ class SentenceResult(BaseModel):
     input: str
     index_input: int
     role_answers: List[RoleAnswer]
+
+class EventSummary(BaseModel):
+    event_type: str
+    frequency: int
+    sentences: List[str]  # Các câu chứa sự kiện này
+    total_roles: int  # Tổng số role được tìm thấy cho sự kiện này
+
+class SummaryResponse(BaseModel):
+    top_events: List[EventSummary]
+    total_sentences: int
+    total_events: int
 
 def simple_sent_tokenize(text: str):
     # cắt theo dấu . ! ? + xuống dòng
@@ -252,6 +264,74 @@ def extract(req: ExtractRequest):
         })
 
     return results
+
+
+@app.post("/extract-summary", response_model=SummaryResponse)
+def extract_summary(req: ExtractRequest):
+    """
+    Tổng hợp tất cả sự kiện từ các câu và tìm top 3 sự kiện quan trọng nhất
+    """
+    text = req.text
+    top_k = req.top_k
+
+    # 1) Lấy kết quả extract từ endpoint cũ
+    sentences = simple_sent_tokenize(text)
+    all_events = []  # List để lưu tất cả sự kiện
+    event_sentences = {}  # Dict để lưu câu chứa mỗi sự kiện
+    event_roles = {}  # Dict để đếm số role của mỗi sự kiện
+
+    for idx, sent in enumerate(sentences):
+        sent_clean = sent.strip()
+        if not sent_clean:
+            continue
+
+        # 2) retrieve top-k event types for this sentence with confidence filtering
+        try:
+            retrieved_events = retriever.retrieve(sent_clean, topk=top_k * 3)
+            top_events = [et for et, score in retrieved_events if score > 0.5][:top_k]
+        except Exception as e:
+            print("Retriever error:", e)
+            top_events = []
+
+        # 3) Xử lý từng sự kiện trong câu này
+        for ev in top_events:
+            if ev not in ontology:
+                continue
+            
+            # Thêm sự kiện vào danh sách
+            all_events.append(ev)
+            
+            # Lưu câu chứa sự kiện này
+            if ev not in event_sentences:
+                event_sentences[ev] = []
+            if sent_clean not in event_sentences[ev]:
+                event_sentences[ev].append(sent_clean)
+            
+            # Đếm số role của sự kiện này
+            if ev not in event_roles:
+                event_roles[ev] = 0
+            questions = ontology[ev].get("questions", {})
+            event_roles[ev] += len(questions)
+
+    # 4) Đếm tần suất và tìm top 3
+    event_counter = Counter(all_events)
+    top_3_events = event_counter.most_common(3)
+
+    # 5) Tạo response
+    top_events_summary = []
+    for event_type, frequency in top_3_events:
+        top_events_summary.append(EventSummary(
+            event_type=event_type,
+            frequency=frequency,
+            sentences=event_sentences.get(event_type, []),
+            total_roles=event_roles.get(event_type, 0)
+        ))
+
+    return SummaryResponse(
+        top_events=top_events_summary,
+        total_sentences=len(sentences),
+        total_events=len(event_counter)
+    )
 
 
 @app.get("/health")

@@ -1,0 +1,144 @@
+{
+  "test_samples": [
+    {
+      "category": "Conflict - Attack",
+      "description": "Tin tức về tấn công khủng bố (domain chính của training data)",
+      "text": "A suicide bomber detonated explosives near the government building, killing at least 15 people and injuring 30 others. The attack occurred during morning rush hour when the building was crowded with employees and visitors. Security forces immediately cordoned off the area and began investigating the incident.",
+      "expected_events": [
+        "Conflict.Attack.DetonateExplode",
+        "Life.Die.Unspecified", 
+        "Life.Injure.Unspecified"
+      ],
+      "difficulty": "Easy - High confidence expected"
+    },
+    {
+      "category": "Justice - Arrest",
+      "description": "Bắt giữ tội phạm (domain phổ biến trong training)",
+      "text": "Police arrested three suspects in connection with the bank robbery that occurred last week. The suspects were apprehended during a raid on their hideout in the northern district. Authorities found stolen money and weapons at the location.",
+      "expected_events": [
+        "Justice.ArrestJailDetain.Unspecified",
+        "Justice.InvestigateCrime.Unspecified"
+      ],
+      "difficulty": "Easy - High confidence expected"
+    },
+    {
+      "category": "Conflict - Violence",
+      "description": "Bạo lực và tấn công (domain chính)",
+      "text": "Protesters clashed with police during the demonstration, resulting in several injuries. The violence erupted when demonstrators tried to break through the barricades. Police used tear gas to disperse the crowd and arrested several individuals.",
+      "expected_events": [
+        "Conflict.Attack.Unspecified",
+        "Life.Injure.Unspecified",
+        "Justice.ArrestJailDetain.Unspecified"
+      ],
+      "difficulty": "Easy - High confidence expected"
+    },
+    {
+      "category": "Life - Death",
+      "description": "Cái chết do tai nạn (domain phổ biến)",
+      "text": "A car accident on Highway 101 claimed the lives of four people and left two others seriously injured. The crash occurred when a truck lost control and collided with multiple vehicles. Emergency services rushed to the scene to provide medical assistance.",
+      "expected_events": [
+        "Life.Die.Unspecified",
+        "Life.Injure.Unspecified",
+        "Disaster.Crash.Unspecified"
+      ],
+      "difficulty": "Easy - High confidence expected"
+    },
+    {
+      "category": "Justice - Trial",
+      "description": "Xét xử tội phạm (domain Justice)",
+      "text": "The court sentenced the convicted murderer to life in prison after a lengthy trial that lasted three months. The jury found the defendant guilty of first-degree murder based on DNA evidence and witness testimony. The victim's family expressed relief at the verdict.",
+      "expected_events": [
+        "Justice.Sentence.Unspecified",
+        "Justice.TrialHearing.Unspecified"
+      ],
+      "difficulty": "Medium - Good confidence expected"
+    },
+    {
+      "category": "Contact - Meeting",
+      "description": "Cuộc họp quan trọng (domain Contact)",
+      "text": "World leaders met in Geneva to discuss climate change policies and international cooperation. The summit brought together representatives from 50 countries to address environmental challenges. Several agreements were reached during the three-day conference.",
+      "expected_events": [
+        "Contact.Contact.Meet",
+        "Contact.Contact.Unspecified"
+      ],
+      "difficulty": "Medium - Good confidence expected"
+    },
+    {
+      "category": "Mixed Domain - Complex",
+      "description": "Văn bản phức tạp với nhiều sự kiện (test khả năng phân biệt)",
+      "text": "The terrorist attack on the embassy killed 12 people and injured 25 others. Police arrested two suspects who were found hiding in a nearby building. The government condemned the attack and vowed to bring the perpetrators to justice. Emergency services provided medical assistance to the wounded.",
+      "expected_events": [
+        "Conflict.Attack.Unspecified",
+        "Life.Die.Unspecified",
+        "Life.Injure.Unspecified", 
+        "Justice.ArrestJailDetain.Unspecified",
+        "Contact.Contact.Broadcast"
+      ],
+      "difficulty": "Hard - Multiple events, needs good discrimination"
+    },
+    {
+      "category": "Artifact - Manufacturing",
+      "description": "Sản xuất vũ khí (domain ít phổ biến)",
+      "text": "Authorities discovered a bomb-making facility in the abandoned warehouse. Police found explosives, timers, and other materials used to manufacture improvised explosive devices. The investigation revealed that the facility had been operating for several months.",
+      "expected_events": [
+        "ArtifactExistence.ManufactureAssemble.Unspecified",
+        "Justice.InvestigateCrime.Unspecified"
+      ],
+      "difficulty": "Hard - Less common domain"
+    },
+    {
+      "category": "Movement - Transportation",
+      "description": "Vận chuyển bất hợp pháp (domain Movement)",
+      "text": "Border patrol agents intercepted a truck carrying illegal immigrants across the border. The vehicle was stopped at a checkpoint where officers discovered 25 people hidden in the cargo area. The driver was arrested and charged with human trafficking.",
+      "expected_events": [
+        "Movement.Transportation.IllegalTransportation",
+        "Justice.ArrestJailDetain.Unspecified"
+      ],
+      "difficulty": "Hard - Less common domain"
+    },
+    {
+      "category": "Edge Case - Ambiguous",
+      "description": "Trường hợp mơ hồ, dễ nhầm lẫn",
+      "text": "The U.S. Department of State issued a statement regarding the recent developments in the region. Officials expressed concern about the escalating tensions and called for diplomatic solutions. The statement was broadcast on major news networks.",
+      "expected_events": [
+        "Contact.Contact.Broadcast"
+      ],
+      "expected_no_events": [
+        "Justice.Sentence.Unspecified" 
+      ],
+      "difficulty": "Very Hard - Easy to misclassify"
+    }
+  ],
+  
+  "test_instructions": {
+    "purpose": "Test model performance on domains related to training data",
+    "evaluation_criteria": [
+      "Correct event type identification",
+      "Proper role extraction", 
+      "Avoiding false positives",
+      "Handling multiple events in one text",
+      "Domain-specific accuracy"
+    ],
+    "expected_behavior": {
+      "easy_samples": "Should achieve >80% accuracy",
+      "medium_samples": "Should achieve >60% accuracy", 
+      "hard_samples": "Should achieve >40% accuracy",
+      "edge_cases": "Should avoid obvious misclassifications"
+    }
+  },
+  
+  "api_test_commands": [
+    {
+      "name": "Test single easy sample",
+      "command": "curl -X POST 'http://localhost:8000/extract' -H 'Content-Type: application/json' -d '{\"text\": \"A suicide bomber detonated explosives near the government building, killing at least 15 people.\", \"top_k\": 3}'"
+    },
+    {
+      "name": "Test summary endpoint", 
+      "command": "curl -X POST 'http://localhost:8000/extract-summary' -H 'Content-Type: application/json' -d '{\"text\": \"The terrorist attack on the embassy killed 12 people. Police arrested two suspects. The government condemned the attack.\", \"top_k\": 2}'"
+    },
+    {
+      "name": "Test edge case",
+      "command": "curl -X POST 'http://localhost:8000/extract' -H 'Content-Type: application/json' -d '{\"text\": \"The U.S. Department of State issued a statement regarding recent developments.\", \"top_k\": 1}'"
+    }
+  ]
+}
