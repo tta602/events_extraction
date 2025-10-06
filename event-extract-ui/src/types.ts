@@ -10,3 +10,14 @@ export interface SentenceResult {
   index_input: number;
   role_answers: RoleAnswer[];
 }
+
+export interface EventSummary { 
+  event_type: string; frequency: number; 
+  sentences: string[]; total_roles: number; 
+} 
+  
+export interface SummaryResponse { 
+  top_events: EventSummary[]; 
+  total_sentences: number; 
+  total_events: number; 
+}
