@@ -8,7 +8,6 @@ import torch
 from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import BartForConditionalGeneration, AutoTokenizer
-import nltk
 import re
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -39,15 +38,6 @@ TRAIN_LABELS_PATH = "processing_data/train.json"
 EVENT_TYPES_CACHE = "processing_data/event_types.json"
 ONTOLOGY_PATH = "ontoloy/event_role_WIKI_q.json"  # sửa đúng path của bạn
 
-# ---- ensure nltk punkt available ----
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt")
-
-from nltk.tokenize import sent_tokenize
-
-
 # ---------------- Helpers ----------------
 def find_best_bart_checkpoint(checkpoint_dir: Path) -> Optional[Path]:
     """Return path to best bart checkpoint saved as bart_best_model_epoch{n}.pt using best_checkpoint.txt."""
@@ -61,6 +51,7 @@ def find_best_bart_checkpoint(checkpoint_dir: Path) -> Optional[Path]:
         return None
     try:
         epoch = int(txt.read_text().strip())
+        print(f"Best checkpoint epoch read from: {epoch}")
     except Exception:
         return None
     candidate = checkpoint_dir / f"bart_best_model_epoch{epoch}.pt"
@@ -83,7 +74,7 @@ def load_bart_and_tokenizer(checkpoint_dir: Path, base_model_name: str):
 
     # ensure special tokens used in training exist (e.g., <tgr>, [sep_arg], etc.)
     # add tokens if necessary (match whatever you used in training)
-    special_tokens = ["<tgr>", "[sep_arg]"]
+    special_tokens = ["<tgr>"]
     added = tokenizer.add_tokens([t for t in special_tokens if t not in tokenizer.get_vocab()])
     if added:
         print(f"Added {added} special tokens to tokenizer")

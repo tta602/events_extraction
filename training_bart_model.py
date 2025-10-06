@@ -9,6 +9,7 @@ from src.event_argument_dataset import EventArgumentDataset
 from src.eventtype_retriever import EventTypeRetriever
 from src.utils.data_utils import build_labels, load_json_or_jsonl
 from src.utils.device_util import getDeviceInfo
+from src.utils.compute_metric import compute_metrics
 
 # ---------------------- Config ----------------------
 DEVICE = getDeviceInfo()
@@ -111,7 +112,8 @@ def evaluate(model, loader, device):
             all_targets.extend(targets)
 
     avg_loss = total_loss / len(loader)
-    return avg_loss, all_predictions, all_targets
+    precision, recall, f1 = compute_metrics(all_predictions, all_targets)
+    return avg_loss, all_predictions, all_targets, precision, recall, f1
 
 # ---------------------- Training loop + checkpoint ----------------------
 optimizer = AdamW(model.parameters(), lr=LR)
@@ -161,5 +163,9 @@ model.to(DEVICE)
 print(f"Loaded best model from epoch {best_epoch}")
 
 # Evaluate on test set
-test_loss, test_preds, test_targets = evaluate(model, test_loader, DEVICE)
-print(f"Test loss: {test_loss:.4f}")
+val_loss, val_preds, val_targets, p, r, f1 = evaluate(model, val_loader, DEVICE)
+print(f"Val Loss: {val_loss:.4f} | Precision: {p:.4f} | Recall: {r:.4f} | F1: {f1:.4f}")
+
+test_loss, test_preds, test_targets, p, r, f1 = evaluate(model, test_loader, DEVICE)
+print(f"Test Loss: {test_loss:.4f} | Precision: {p:.4f} | Recall: {r:.4f} | F1: {f1:.4f}")
+#pip install scikit-learn
