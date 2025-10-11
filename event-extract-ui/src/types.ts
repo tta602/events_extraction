@@ -11,9 +11,18 @@ export interface SentenceResult {
   role_answers: RoleAnswer[];
 }
 
+export interface RoleInfo {
+  role: string;
+  answer: string;
+  sentence: string;
+}
+
 export interface EventSummary { 
-  event_type: string; frequency: number; 
-  sentences: string[]; total_roles: number; 
+  event_type: string; 
+  frequency: number; 
+  sentences: string[]; 
+  total_roles: number;
+  roles: RoleInfo[];  // Thông tin chi tiết về roles được phát hiện
 } 
   
 export interface SummaryResponse { 

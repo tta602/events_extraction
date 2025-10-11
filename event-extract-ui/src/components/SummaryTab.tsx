@@ -1,6 +1,8 @@
 import React from 'react';
-import { Card, List, Statistic, Row, Col, Tag, Typography } from 'antd';
+import { Card, List, Statistic, Row, Col, Tag, Typography, Divider } from 'antd';
 import type { SummaryResponse } from '../types';
+import EventTypeDisplay from './EventTypeDisplay';
+import HighlightedText from './HighlightedText';
 
 const { Title, Text } = Typography;
 
@@ -57,10 +59,12 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ data }) => {
                   </Tag>
                 }
                 title={
-                  <div>
-                    <Title level={4} style={{ margin: 0, display: 'inline' }}>
-                      {event.event_type}
-                    </Title>
+                  <div style={{ marginBottom: 16 }}>
+                    <EventTypeDisplay 
+                      eventType={event.event_type} 
+                      size="large"
+                      showOriginal={true}
+                    />
                     <Tag color="green" style={{ marginLeft: 8 }}>
                       {event.frequency} lần xuất hiện
                     </Tag>
@@ -71,13 +75,40 @@ const SummaryTab: React.FC<SummaryTabProps> = ({ data }) => {
                 }
                 description={
                   <div>
-                    <Text strong>Các câu chứa sự kiện:</Text>
+                    {/* Hiển thị roles được phát hiện */}
+                    {event.roles && event.roles.length > 0 && (
+                      <div style={{ marginBottom: 16 }}>
+                        <Text strong>🎯 Roles được phát hiện:</Text>
+                        <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          {event.roles.map((roleInfo, idx) => (
+                            <Tag key={idx} color="blue" style={{ marginBottom: 4 }}>
+                              <Text strong>{roleInfo.role}:</Text> {roleInfo.answer}
+                            </Tag>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <Divider style={{ margin: '12px 0' }} />
+                    
+                    {/* Hiển thị các câu với highlights */}
+                    <Text strong>📝 Các câu chứa sự kiện:</Text>
                     <ul style={{ marginTop: 8, marginBottom: 0 }}>
-                      {event.sentences.map((sentence, idx) => (
-                        <li key={idx}>
-                          <Text italic>"{sentence}"</Text>
-                        </li>
-                      ))}
+                      {event.sentences.map((sentence, idx) => {
+                        // Lấy tất cả answers từ roles của event này để highlight
+                        const highlights = event.roles
+                          .filter(r => r.sentence === sentence)
+                          .map(r => r.answer);
+                        
+                        return (
+                          <li key={idx} style={{ marginBottom: 8 }}>
+                            <HighlightedText 
+                              text={sentence} 
+                              highlights={highlights}
+                            />
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 }

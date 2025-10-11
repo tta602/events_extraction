@@ -1,0 +1,87 @@
+{
+  "event_type_mapping": {
+    "ArtifactExistence.DamageDestroyDisableDismantle.Damage": "Hư hỏng tài sản",
+    "ArtifactExistence.DamageDestroyDisableDismantle.Destroy": "Phá hủy tài sản",
+    "ArtifactExistence.DamageDestroyDisableDismantle.DisableDefuse": "Vô hiệu hóa/vô hiệu hóa bom",
+    "ArtifactExistence.DamageDestroyDisableDismantle.Dismantle": "Tháo dỡ tài sản",
+    "ArtifactExistence.DamageDestroyDisableDismantle.Unspecified": "Hư hỏng tài sản (khác)",
+    "ArtifactExistence.ManufactureAssemble.Unspecified": "Sản xuất/lắp ráp",
+    
+    "Cognitive.IdentifyCategorize.Unspecified": "Nhận dạng/phân loại",
+    "Cognitive.Inspection.SensoryObserve": "Quan sát/kiểm tra",
+    "Cognitive.Research.Unspecified": "Nghiên cứu",
+    "Cognitive.TeachingTrainingLearning.Unspecified": "Giảng dạy/học tập",
+    
+    "Conflict.Attack.DetonateExplode": "Tấn công bằng bom/nổ",
+    "Conflict.Attack.Unspecified": "Tấn công (khác)",
+    "Conflict.Defeat.Unspecified": "Đánh bại",
+    "Conflict.Demonstrate.DemonstrateWithViolence": "Biểu tình có bạo lực",
+    "Conflict.Demonstrate.Unspecified": "Biểu tình",
+    
+    "Contact.Contact.Broadcast": "Phát sóng/truyền thông",
+    "Contact.Contact.Correspondence": "Thư từ/trao đổi",
+    "Contact.Contact.Meet": "Gặp gỡ/họp",
+    "Contact.Contact.Unspecified": "Liên lạc (khác)",
+    "Contact.RequestCommand.Broadcast": "Yêu cầu qua phát sóng",
+    "Contact.RequestCommand.Meet": "Yêu cầu qua gặp gỡ",
+    "Contact.RequestCommand.Unspecified": "Yêu cầu/lệnh (khác)",
+    "Contact.ThreatenCoerce.Broadcast": "Đe dọa qua phát sóng",
+    "Contact.ThreatenCoerce.Correspondence": "Đe dọa qua thư từ",
+    "Contact.ThreatenCoerce.Unspecified": "Đe dọa/cưỡng ép",
+    
+    "Control.ImpedeInterfereWith.Unspecified": "Cản trở/can thiệp",
+    
+    "Disaster.Crash.Unspecified": "Tai nạn/va chạm",
+    "Disaster.DiseaseOutbreak.Unspecified": "Dịch bệnh bùng phát",
+    
+    "GenericCrime.GenericCrime.GenericCrime": "Tội phạm (chung)",
+    
+    "Justice.Acquit.Unspecified": "Tuyên bố vô tội",
+    "Justice.ArrestJailDetain.Unspecified": "Bắt giữ/giam giữ",
+    "Justice.ChargeIndict.Unspecified": "Buộc tội/cáo trạng",
+    "Justice.Convict.Unspecified": "Kết án có tội",
+    "Justice.InvestigateCrime.Unspecified": "Điều tra tội phạm",
+    "Justice.ReleaseParole.Unspecified": "Thả tự do/ân xá",
+    "Justice.Sentence.Unspecified": "Án phạt",
+    "Justice.TrialHearing.Unspecified": "Xét xử/thẩm vấn",
+    
+    "Life.Die.Unspecified": "Cái chết",
+    "Life.Infect.Unspecified": "Nhiễm bệnh",
+    "Life.Injure.Unspecified": "Bị thương",
+    
+    "Medical.Intervention.Unspecified": "Can thiệp y tế",
+    
+    "Movement.Transportation.Evacuation": "Sơ tán",
+    "Movement.Transportation.IllegalTransportation": "Vận chuyển bất hợp pháp",
+    "Movement.Transportation.PreventPassage": "Ngăn cản di chuyển",
+    "Movement.Transportation.Unspecified": "Vận chuyển (khác)",
+    
+    "Personnel.EndPosition.Unspecified": "Kết thúc vị trí",
+    "Personnel.StartPosition.Unspecified": "Bắt đầu vị trí",
+    
+    "Transaction.Donation.Unspecified": "Quyên góp",
+    "Transaction.ExchangeBuySell.Unspecified": "Mua bán/trao đổi"
+  },
+  
+  "category_mapping": {
+    "ArtifactExistence": "Tài sản",
+    "Cognitive": "Nhận thức",
+    "Conflict": "Xung đột",
+    "Contact": "Liên lạc",
+    "Control": "Kiểm soát",
+    "Disaster": "Thảm họa",
+    "GenericCrime": "Tội phạm",
+    "Justice": "Công lý",
+    "Life": "Sinh mạng",
+    "Medical": "Y tế",
+    "Movement": "Di chuyển",
+    "Personnel": "Nhân sự",
+    "Transaction": "Giao dịch"
+  },
+  
+  "description": {
+    "purpose": "Mapping event types từ format phức tạp sang tên tiếng Việt dễ hiểu",
+    "usage": "Sử dụng để hiển thị kết quả event extraction cho người dùng",
+    "format": "Original_Event_Type -> Vietnamese_Name"
+  }
+}
